@@ -10,9 +10,10 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.sf.cglib.proxy.NoOp;
 
 import com.ioc.annotations.Inject;
+import com.ioc.context.ContextBeansHolder;
 
 public class CGLibProxyCreator extends ProxyCreator {
-
+	ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 	public CGLibProxyCreator() {
 		super();
 	}
@@ -39,7 +40,7 @@ public class CGLibProxyCreator extends ProxyCreator {
 				Constructor<?> constructor = null;
 				String service = c.getAnnotation(Inject.class)
 						.service();
-				constructorArguments[0] = getGlobalSingletonMap().get(
+				constructorArguments[0] = contextBeansHolder.getGlobalSingletonMap().get(
 						service);
 				try {
 					constructor = className.getConstructor(c
@@ -70,13 +71,13 @@ public class CGLibProxyCreator extends ProxyCreator {
 								.isEmpty()) {
 							field.set(
 									obj,
-									getGlobalProvidesMap().get(
+									contextBeansHolder.getGlobalProvidesMap().get(
 											field.getAnnotation(Inject.class)
 													.factory()));
 						} else {
 							field.set(
 									obj,
-									getGlobalBeansMap().get(
+									contextBeansHolder.getGlobalBeansMap().get(
 											field.getAnnotation(Inject.class)
 													.service()));
 						}

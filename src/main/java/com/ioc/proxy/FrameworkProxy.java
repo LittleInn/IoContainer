@@ -8,11 +8,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import com.ioc.annotations.Inject;
+import com.ioc.context.ContextBeansHolder;
 
 public class FrameworkProxy implements InvocationHandler {
 
 	private Object realObject;
 	private ProxyCreator proxyCreator;
+	private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 
 	public FrameworkProxy(Object realObject, ProxyCreator proxyCreator) {
 		super();
@@ -55,12 +57,12 @@ public class FrameworkProxy implements InvocationHandler {
 			field.setAccessible(true);
 			if (field.isAnnotationPresent(Inject.class)) {
 				if (!field.getAnnotation(Inject.class).factory().isEmpty()) {
-					field.set(realObject, proxyCreator.getGlobalProvidesMap()
+					field.set(realObject, contextBeansHolder.getGlobalProvidesMap()
 							.get(field.getAnnotation(Inject.class).factory()));
 				} else {
 					field.set(
 							realObject,
-							proxyCreator.getGlobalBeansMap()
+							contextBeansHolder.getGlobalBeansMap()
 									.get(field.getAnnotation(Inject.class)
 											.service()));
 				}
@@ -78,7 +80,7 @@ public class FrameworkProxy implements InvocationHandler {
 				String annotation = constructor.getAnnotation(Inject.class)
 						.service();
 				try {
-					constructedObj = constructor.newInstance(proxyCreator
+					constructedObj = constructor.newInstance(contextBeansHolder
 							.getGlobalBeansMap().get(annotation));
 				} catch (InstantiationException | IllegalAccessException
 						| IllegalArgumentException | InvocationTargetException e) {
@@ -99,7 +101,7 @@ public class FrameworkProxy implements InvocationHandler {
 
 				try {
 					method.invoke(object,
-							proxyCreator.getGlobalBeansMap().get(annotation));
+							contextBeansHolder.getGlobalBeansMap().get(annotation));
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
 					e.printStackTrace();

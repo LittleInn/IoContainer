@@ -1,5 +1,7 @@
 package com.ioc.context;
 
+import java.util.List;
+
 import com.ioc.proxy.ProxyCreator;
 
 public abstract class Context {
@@ -10,21 +12,22 @@ public abstract class Context {
 		this.proxyCreator = proxyCreator;
 	}
 
-
-	public  void register(String packageName){
+	public void register(String packageName) {
 		proxyCreator.loadSingletons(packageName);
 		proxyCreator.loadBeanClasses();
 		proxyCreator.loadProvidedPackageClass(packageName);
 	}
-	public  Object getBean(String beanName){
-//		return proxyCreator.getGlobalSingletonMap().get(beanName);
-		return proxyCreator.getGlobalBeansMap().get(beanName);
+
+	public void register(List<Class> classes) {
+		proxyCreator.loadSingletons(classes);
+		proxyCreator.loadBeanClasses(classes);
+		proxyCreator.loadProvidedPackageClass(classes);
 	}
-	
+
 	public ProxyCreator getProxyCreator() {
 		return proxyCreator;
 	}
-	
+
 	public void setProxyCreator(ProxyCreator proxyCreator) {
 		this.proxyCreator = proxyCreator;
 	}

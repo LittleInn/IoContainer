@@ -4,9 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.ioc.annotations.Inject;
+import com.ioc.context.ContextBeansHolder;
 
 public class InvocationHandlerProxyCreator extends ProxyCreator {
-
+	private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 	public Object createProxy(Class<?> className) {
 		Object instance = null;
 		Object newInstance = null;
@@ -42,7 +43,7 @@ public class InvocationHandlerProxyCreator extends ProxyCreator {
 					String service = constructor.getAnnotation(Inject.class)
 							.service();
 					constructedObj = constructor
-							.newInstance(getGlobalSingletonMap().get(service));
+							.newInstance(contextBeansHolder.getGlobalSingletonMap().get(service));
 					FrameworkProxy frameworkProxy = new FrameworkProxy(
 							constructedObj, this);
 					newInstance = frameworkProxy.newInstance(constructedObj);
