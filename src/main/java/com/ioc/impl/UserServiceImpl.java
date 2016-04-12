@@ -2,6 +2,9 @@ package com.ioc.impl;
 
 import com.ioc.annotations.Bean;
 import com.ioc.annotations.Inject;
+import com.ioc.context.ContextBeansHolder;
+import com.ioc.model.SingletonCGLIB;
+import com.ioc.model.SingletonServiceA;
 import com.ioc.model.User;
 import com.ioc.service.CompanyService;
 import com.ioc.service.UserService;
@@ -9,13 +12,21 @@ import com.ioc.service.UserService;
 @Bean(name = "userServiceImpl")
 public class UserServiceImpl implements UserService {
 
+    private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
+
     @Inject(service = "userInstance", factory = "userInstance")
-    public User user;
+    private User user;
 
-    @Inject(service = "companyServiceImpl")
-    public CompanyService companyService;
+    @Inject
+    private CompanyService companyService;
 
-    public CompanyService compService;
+    @Inject
+    private SingletonCGLIB singletonCGLIB;
+
+    @Inject(service = "SingletonServiceAImpl")
+    private SingletonServiceA singletonServiceA;
+
+    private CompanyService compService;
 
     @Inject(service = "mailService")
     private MailService mailService;
@@ -34,6 +45,7 @@ public class UserServiceImpl implements UserService {
 	System.out.println("----------------- @Inject annotation by method -----------------");
 	compService.addUser();
 	// test @Inject by field
+	System.out.println("BeansMap: " + contextBeansHolder.getGlobalBeansMap());
 	System.out.println("----------------- @Inject by field ------------------------");
 	companyService.addUser();
 
@@ -42,7 +54,11 @@ public class UserServiceImpl implements UserService {
 	// System.out.println("Default user Name: " + user.getName());
 
 	// System.out.println("---------------------@Inject byCGLib");
-	// mailService.printMail();
+	mailService.printMail();
+	System.out.println("SINGLETON");
+	singletonServiceA.printInfo();
+	System.out.println("SINGLETON CGLIB");
+	singletonCGLIB.method();
     }
 
     public CompanyService getCompanyServiceMethod() {

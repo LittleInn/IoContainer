@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Inject {
 
-	public String service();
+    public String service() default "";
 
-	public String factory() default "";
+    public String factory() default "";
 
 }

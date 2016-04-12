@@ -112,12 +112,15 @@ public abstract class ProxyCreator {
 		String name = ((Bean) annotation).name();
 		Object proxy = createBeanProxy(annotatedClass);
 		contextBeansHolder.getGlobalBeansMap().put(name, proxy);
-		// contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getSimpleName(),
-		// proxy);
+		if (annotatedClass.getInterfaces().length > 0) {
+		    contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getInterfaces()[0].getSimpleName(), proxy);
+		} else {
+		    contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getSimpleName(), proxy);
+		}
 		break;
 	    }
 	}
-	System.out.println("Bean Annotation was loaded to the map");
+	// System.out.println("Bean Annotation was loaded to the map");
 	// System.out.println(getGlobalBeansMap());
 	System.out.println();
     }
