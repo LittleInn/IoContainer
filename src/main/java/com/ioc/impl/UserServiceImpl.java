@@ -9,47 +9,49 @@ import com.ioc.service.UserService;
 @Bean(name = "userServiceImpl")
 public class UserServiceImpl implements UserService {
 
-	@Inject(service = "userInstance", factory = "userInstance")
-	public User user;
+    @Inject(service = "userInstance", factory = "userInstance")
+    public User user;
 
-	@Inject(service = "companyServiceImpl")
-	public CompanyService companyService;
+    @Inject(service = "companyServiceImpl")
+    public CompanyService companyService;
 
-	public CompanyService compService;
+    public CompanyService compService;
 
+    @Inject(service = "mailService")
+    private MailService mailService;
 
-	public UserServiceImpl() {
-	}
+    public UserServiceImpl() {
+    }
 
-	
+    public boolean createUser(String name) {
+	User user = new User("Test");
+	System.out.println("User created: " + name);
+	return (user != null) ? true : false;
+    }
 
-	public boolean createUser(String name) {
-		User user = new User("Test");
-		System.out.println("User created: " + name);
-		return (user != null) ? true : false;
-	}
+    public void addUserToCompany() {
+	// test @Inject annotation by method
+	System.out.println("----------------- @Inject annotation by method -----------------");
+	compService.addUser();
+	// test @Inject by field
+	System.out.println("----------------- @Inject by field ------------------------");
+	companyService.addUser();
 
-	
-	public void addUserToCompany() {
-		//test @Inject annotation by method
-		System.out.println("----------------- @Inject annotation by method -----------------");
-		compService.addUser();
-		//test @Inject by field
-		System.out.println("----------------- @Inject by field ------------------------");
-		companyService.addUser();
-		
-		//test @Inject by factory-method
-		System.out.println("------------------- @Inject by factory-method------------");
-		System.out.println("Default user Name: " + user.getName());
-	}
+	// test @Inject by factory-method
+	System.out.println("------------------- @Inject by factory-method------------");
+	// System.out.println("Default user Name: " + user.getName());
 
-	public CompanyService getCompanyServiceMethod() {
-		return compService;
-	}
+	// System.out.println("---------------------@Inject byCGLib");
+	// mailService.printMail();
+    }
 
-	@Inject(service = "companyServiceImpl")
-	public void setCompanyServiceMethod(CompanyService companyServiceMethod) {
-		this.compService = companyServiceMethod;
-	}
+    public CompanyService getCompanyServiceMethod() {
+	return compService;
+    }
+
+    @Inject(service = "companyServiceImpl")
+    public void setCompanyServiceMethod(CompanyService companyServiceMethod) {
+	this.compService = companyServiceMethod;
+    }
 
 }

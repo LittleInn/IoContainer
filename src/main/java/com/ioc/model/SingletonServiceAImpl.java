@@ -2,25 +2,31 @@ package com.ioc.model;
 
 import com.ioc.annotations.Inject;
 import com.ioc.annotations.Singleton;
+import com.ioc.service.CompanyService;
 
 @Singleton
 public class SingletonServiceAImpl implements SingletonServiceA {
 
-	// @Inject(service = "SingletonServiceBImpl")
-	public SingletonServiceB singletonServiceB;
+    public SingletonServiceB singletonServiceB;
 
-	public SingletonServiceAImpl() {
-	}
+    @Inject(service = "companyServiceImpl")
+    public CompanyService companyService;
 
-	@Inject(service = "SingletonServiceBImpl")
-	public SingletonServiceAImpl(SingletonServiceB singletonServiceB) {
-		this.singletonServiceB = singletonServiceB;
-	}
+    public SingletonServiceAImpl() {
+    }
 
-	 @Override
-	public void printInfo() {
-		System.out.println("In SingletonServiceAImpl printInfo() method");
-		singletonServiceB.provideInfo();
-	}
+    @Inject(service = "SingletonServiceBImpl")
+    public SingletonServiceAImpl(SingletonServiceB singletonServiceB) {
+	System.out.println("SingletonServiceAImpl(singletonServiceB): " + singletonServiceB);
+	this.singletonServiceB = singletonServiceB;
+    }
+
+    @Override
+    public void printInfo() {
+	System.out.println("In SingletonServiceAImpl printInfo() method");
+	System.out.println("Included class object " + singletonServiceB);
+	singletonServiceB.provideInfo();
+	companyService.createCompany("Create company in Singleton");
+    }
 
 }

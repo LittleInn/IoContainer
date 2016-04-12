@@ -7,7 +7,7 @@ import java.util.List;
 import com.ioc.annotations.Bean;
 import com.ioc.annotations.Singleton;
 
-public class ContextHelper {
+public class ContextBuilder {
 
 	List<Class> cgLibList = new ArrayList<Class>();
 	List<Class> invocList = new ArrayList<Class>();
@@ -15,12 +15,16 @@ public class ContextHelper {
 	private ClassLoader contextClassLoader;
 	private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 
-	public ContextHelper() {
+	public ContextBuilder() {
 		parser = new ParseClasses();
 		contextClassLoader = Thread.currentThread().getContextClassLoader();
 	}
 
 	public Object getBean(String beanName) {
+		Object bean = contextBeansHolder.getGlobalSingletonMap().get(beanName);
+		if(bean!=null){
+			return bean;
+		}
 		return contextBeansHolder.getGlobalBeansMap().get(beanName);
 	}
 
@@ -54,11 +58,12 @@ public class ContextHelper {
 
 		List<Class> invocList = getInvocList();
 		List<Class> cglibList = getCgLibList();
-
 		scanBeanClasses();
 
-		context.register(invocList);
-		cgLibContext.register(cglibList);
+		System.out.println("invocList: "+invocList);
+		System.out.println("cglibList: "+cglibList);
+		context.buildContext(invocList);
+		cgLibContext.buildContext(cglibList);
 	}
 
 	public ParseClasses getParser() {

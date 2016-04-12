@@ -7,40 +7,38 @@ import java.util.List;
 import java.util.Map;
 
 public class ContextBeansHolder {
-	public static  List<String> packages = new ArrayList<String>(Arrays.asList(
-			"com/ioc", "com/ioc/model", "com/ioc/annotations", "com/ioc/impl",
-			"com/ioc/service", "com/ioc/usage"));
-	
-	private Map<String, Object> globalBeansMap = new HashMap<String, Object>();
-	private Map<String, Object> globalSingletonMap = new HashMap<String, Object>();
-	private Map<String, Object> globalProvidesMap = new HashMap<String, Object>();
+    public static List<String> packages = new ArrayList<String>(Arrays.asList("com/ioc", "com/ioc/model", "com/ioc/annotations", "com/ioc/impl", "com/ioc/service", "com/ioc/usage"));
 
-	public static final ContextBeansHolder INSTANCE = new ContextBeansHolder();
+    private Map<String, Object> globalBeansMap = new HashMap<String, Object>();
+    private Map<String, Object> globalSingletonMap = new HashMap<String, Object>();
+    private Map<String, Object> globalProvidesMap = new HashMap<String, Object>();
 
-	public ContextBeansHolder() {
-	}
+    public static final ContextBeansHolder INSTANCE = new ContextBeansHolder();
 
-	public Map<String, Object> getGlobalBeansMap() {
-		return globalBeansMap;
-	}
+    public ContextBeansHolder() {
+    }
 
-	public void setGlobalBeansMap(Map<String, Object> globalBeansMap) {
-		this.globalBeansMap = globalBeansMap;
-	}
+    public Map<String, Object> getGlobalBeansMap() {
+	return globalBeansMap;
+    }
 
-	public Map<String, Object> getGlobalSingletonMap() {
-		return globalSingletonMap;
-	}
+    public void setGlobalBeansMap(Map<String, Object> globalBeansMap) {
+	this.globalBeansMap = globalBeansMap;
+    }
 
-	public void setGlobalSingletonMap(Map<String, Object> globalSingletonMap) {
-		this.globalSingletonMap = globalSingletonMap;
-	}
+    public Map<String, Object> getGlobalSingletonMap() {
+	return globalSingletonMap;
+    }
 
-	public Map<String, Object> getGlobalProvidesMap() {
-		return globalProvidesMap;
-	}
+    public void setGlobalSingletonMap(Map<String, Object> globalSingletonMap) {
+	this.globalSingletonMap = globalSingletonMap;
+    }
 
-	public void setGlobalProvidesMap(Map<String, Object> globalProvidesMap) {
-		this.globalProvidesMap = globalProvidesMap;
-	}
+    public Map<String, Object> getGlobalProvidesMap() {
+	return globalProvidesMap;
+    }
+
+    public void setGlobalProvidesMap(Map<String, Object> globalProvidesMap) {
+	this.globalProvidesMap = globalProvidesMap;
+    }
 }

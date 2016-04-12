@@ -6,6 +6,7 @@ import com.ioc.annotations.Singleton;
 @Singleton
 public class SingletonServiceCImpl implements SingletonServiceC {
 	
+//	@Inject(service = "SingletonServiceAImpl")
 	public SingletonServiceA singletonServiceA;
 
 	public SingletonServiceCImpl() {
@@ -13,6 +14,7 @@ public class SingletonServiceCImpl implements SingletonServiceC {
 
 	@Inject(service = "SingletonServiceAImpl")
 	public SingletonServiceCImpl(SingletonServiceA singletonServiceA) {
+		System.out.println("SingletonServiceCImpl(singletonServiceA): "+singletonServiceA);
 		this.singletonServiceA = singletonServiceA;
 	}
 

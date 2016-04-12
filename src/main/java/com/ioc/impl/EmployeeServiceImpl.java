@@ -8,32 +8,31 @@ import com.ioc.service.EmployeeService;
 @Bean(name = "employeeServiceImpl")
 public class EmployeeServiceImpl implements EmployeeService {
 
-	public CompanyService companyService;
-	
-	public EmployeeServiceImpl() {
-	}
+    public CompanyService companyService;
 
-	@Inject(service = "companyServiceImpl")
-	public EmployeeServiceImpl(CompanyService companyService) {
-		super();
-		this.companyService = companyService;
-	}
+    public EmployeeServiceImpl() {
+    }
 
-	@Override
-	public void addEmployeeToCompany() {
-		// test @Inject by constructor
-		System.out
-				.println("------------------ @Inject by constructor----------------");
-		companyService.addUser();
+    @Inject(service = "companyServiceImpl")
+    public EmployeeServiceImpl(CompanyService companyService) {
+	super();
+	this.companyService = companyService;
+    }
 
-	}
+    @Override
+    public void addEmployeeToCompany() {
+	// test @Inject by constructor
+	System.out.println("------------------ @Inject by constructor----------------");
+	companyService.addUser();
 
-	public CompanyService getCompanyService() {
-		return companyService;
-	}
+    }
 
-	public void setCompanyService(CompanyService companyService) {
-		this.companyService = companyService;
-	}
+    public CompanyService getCompanyService() {
+	return companyService;
+    }
+
+    public void setCompanyService(CompanyService companyService) {
+	this.companyService = companyService;
+    }
 
 }
