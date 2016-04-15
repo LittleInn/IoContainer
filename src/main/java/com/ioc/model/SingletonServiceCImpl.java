@@ -12,7 +12,7 @@ public class SingletonServiceCImpl implements SingletonServiceC {
 	public SingletonServiceCImpl() {
 	}
 
-	@Inject(service = "SingletonServiceAImpl")
+	@Inject(name = "SingletonServiceAImpl")
 	public SingletonServiceCImpl(SingletonServiceA singletonServiceA) {
 		System.out.println("SingletonServiceCImpl(singletonServiceA): "+singletonServiceA);
 		this.singletonServiceA = singletonServiceA;

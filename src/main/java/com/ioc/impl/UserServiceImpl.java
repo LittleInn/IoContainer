@@ -14,7 +14,7 @@ public class UserServiceImpl implements UserService {
 
     private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 
-    @Inject(service = "userInstance", factory = "userInstance")
+    @Inject(name = "userInstance", method = "userInstance")
     private User user;
 
     @Inject
@@ -23,12 +23,12 @@ public class UserServiceImpl implements UserService {
     @Inject
     private SingletonCGLIB singletonCGLIB;
 
-    @Inject(service = "SingletonServiceAImpl")
+    @Inject(name = "SingletonServiceAImpl")
     private SingletonServiceA singletonServiceA;
 
     private CompanyService compService;
 
-    @Inject(service = "mailService")
+    @Inject(name = "mailService")
     private MailService mailService;
 
     public UserServiceImpl() {
@@ -41,22 +41,22 @@ public class UserServiceImpl implements UserService {
     }
 
     public void addUserToCompany() {
-	// test @Inject annotation by method
-	System.out.println("----------------- @Inject annotation by method -----------------");
-	compService.addUser();
-	// test @Inject by field
-	System.out.println("BeansMap: " + contextBeansHolder.getGlobalBeansMap());
-	System.out.println("----------------- @Inject by field ------------------------");
-	companyService.addUser();
-
-	// test @Inject by factory-method
-	System.out.println("------------------- @Inject by factory-method------------");
-	// System.out.println("Default user Name: " + user.getName());
-
-	// System.out.println("---------------------@Inject byCGLib");
-	mailService.printMail();
-	System.out.println("SINGLETON");
-	singletonServiceA.printInfo();
+//	// test @Inject annotation by method
+//	System.out.println("----------------- @Inject annotation by method -----------------");
+//	compService.addUser();
+//	// test @Inject by field
+//	System.out.println("BeansMap: " + contextBeansHolder.getGlobalBeansMap());
+//	System.out.println("----------------- @Inject by field ------------------------");
+//	companyService.addUser();
+//
+//	// test @Inject by factory-method
+//	System.out.println("------------------- @Inject by factory-method------------");
+//	// System.out.println("Default user Name: " + user.getName());
+//
+//	// System.out.println("---------------------@Inject byCGLib");
+//	mailService.printMail();
+//	System.out.println("SINGLETON");
+//	singletonServiceA.printInfo();
 	System.out.println("SINGLETON CGLIB");
 	singletonCGLIB.method();
     }
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
 	return compService;
     }
 
-    @Inject(service = "companyServiceImpl")
+    @Inject(name = "companyServiceImpl")
     public void setCompanyServiceMethod(CompanyService companyServiceMethod) {
 	this.compService = companyServiceMethod;
     }

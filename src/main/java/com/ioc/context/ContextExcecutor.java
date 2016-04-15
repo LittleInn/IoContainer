@@ -7,7 +7,7 @@ import java.util.List;
 import com.ioc.annotations.Bean;
 import com.ioc.annotations.Singleton;
 
-public class ContextBuilder {
+public class ContextExcecutor {
 
     List<Class> cgLibList = new ArrayList<Class>();
     List<Class> invocList = new ArrayList<Class>();
@@ -15,7 +15,7 @@ public class ContextBuilder {
     private ClassLoader contextClassLoader;
     private ContextBeansHolder contextBeansHolder = ContextBeansHolder.INSTANCE;
 
-    public ContextBuilder() {
+    public ContextExcecutor() {
 	parser = new ParseClasses();
 	contextClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -56,6 +56,7 @@ public class ContextBuilder {
 
 	List<Class> invocList = getInvocList();
 	List<Class> cglibList = getCgLibList();
+	
 	scanBeanClasses();
 
 	System.out.println("invocList: " + invocList);

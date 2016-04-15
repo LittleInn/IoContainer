@@ -13,7 +13,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeServiceImpl() {
     }
 
-    @Inject(service = "companyServiceImpl")
+    @Inject(name = "companyServiceImpl")
     public EmployeeServiceImpl(CompanyService companyService) {
 	super();
 	this.companyService = companyService;

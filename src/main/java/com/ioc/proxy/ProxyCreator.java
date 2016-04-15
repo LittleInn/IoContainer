@@ -2,11 +2,13 @@ package com.ioc.proxy;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import com.ioc.annotations.Bean;
+import com.ioc.annotations.Inject;
 import com.ioc.annotations.Provides;
 import com.ioc.annotations.Singleton;
 import com.ioc.context.ContextBeansHolder;
@@ -19,40 +21,22 @@ public abstract class ProxyCreator {
     private ParseClasses parser;
     private ClassLoader contextClassLoader;
 
-    // private Map<String, Object> globalBeansMap = new HashMap<String,
-    // Object>();
-    // private Map<String, Object> globalSingletonMap = new HashMap<String,
-    // Object>();
-    // private Map<String, Object> globalProvidesMap = new HashMap<String,
-    // Object>();
-
     public ProxyCreator() {
 	parser = new ParseClasses();
 	contextClassLoader = Thread.currentThread().getContextClassLoader();
     }
 
-    public void loadSingletons(String packageName) {
+    public void buildSingletonBeans(List<Class> classes) {
 	try {
-	    List<Class> classes = getParser().getClasses(getContextClassLoader(), packageName);
-	    initSingletonMapHolder(classes);
-	    createSingletonObjects(classes);
-	} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SecurityException | NoSuchFieldException | IllegalArgumentException | NoSuchMethodException
-		| InvocationTargetException | IOException e) {
-	    e.printStackTrace();
-	}
-    }
-
-    public void loadSingletons(List<Class> classes) {
-	try {
-	    initSingletonMapHolder(classes);
-	    createSingletonObjects(classes);
+	    initSingletonWithoutFields(classes);
+	    createFullSingletonObjects(classes);
 	} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SecurityException | NoSuchFieldException | IllegalArgumentException | NoSuchMethodException
 		| InvocationTargetException e) {
 	    e.printStackTrace();
 	}
     }
 
-    private void initSingletonMapHolder(List<Class> classes) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SecurityException, NoSuchFieldException,
+    private void initSingletonWithoutFields(List<Class> classes) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SecurityException, NoSuchFieldException,
 	    IllegalArgumentException, NoSuchMethodException, InvocationTargetException {
 	for (Class<?> annotatedClass : classes) {
 	    Annotation[] annotations = annotatedClass.getAnnotations();
@@ -65,32 +49,16 @@ public abstract class ProxyCreator {
 	contextBeansHolder.getGlobalBeansMap().putAll(contextBeansHolder.getGlobalSingletonMap());
     }
 
-    public void createSingletonObjects(List<Class> classes) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchFieldException,
+    public void createFullSingletonObjects(List<Class> classes) throws ClassNotFoundException, InstantiationException, IllegalAccessException, SecurityException, NoSuchFieldException,
 	    NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 	for (Class<?> annotatedClass : classes) {
 	    Annotation[] annotations = annotatedClass.getAnnotations();
 	    for (Annotation annotation : annotations) {
 		if (annotation instanceof Singleton) {
-		    Object createSingletonProxy = createSingletonProxy(annotatedClass);
-		    System.out.println("created object:" + createSingletonProxy);
+		    Object createSingletonProxy = createFullSingletonProxy(annotatedClass);
 		    contextBeansHolder.getGlobalSingletonMap().put(annotatedClass.getSimpleName(), createSingletonProxy);
+		    contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getSimpleName(), createSingletonProxy);
 		}
-	    }
-	    // System.out.println("Init Singleton Map next: "+contextBeansHolder.getGlobalSingletonMap());
-	}
-	// contextBeansHolder.getGlobalBeansMap().putAll(contextBeansHolder.getGlobalSingletonMap());
-    }
-
-    public void loadBeanClasses() {
-	for (String packageName : contextBeansHolder.INSTANCE.packages) {
-	    List<Class> classes;
-	    try {
-		classes = getParser().getClasses(getContextClassLoader(), packageName);
-		for (Class<?> className : classes) {
-		    loadBeanProxy(className);
-		}
-	    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | IOException e) {
-		e.printStackTrace();
 	    }
 	}
     }
@@ -98,14 +66,14 @@ public abstract class ProxyCreator {
     public void loadBeanClasses(List<Class> classes) {
 	for (Class<?> className : classes) {
 	    try {
-		loadBeanProxy(className);
+		buildBeanProxy(className);
 	    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 		e.printStackTrace();
 	    }
 	}
     }
 
-    private void loadBeanProxy(Class<?> annotatedClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private void buildBeanProxy(Class<?> annotatedClass) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
 	Annotation[] annotations = annotatedClass.getAnnotations();
 	for (Annotation annotation : annotations) {
 	    if (annotation instanceof Bean) {
@@ -120,9 +88,6 @@ public abstract class ProxyCreator {
 		break;
 	    }
 	}
-	// System.out.println("Bean Annotation was loaded to the map");
-	// System.out.println(getGlobalBeansMap());
-	System.out.println();
     }
 
     public void loadProvided(Class<?> className) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -132,7 +97,6 @@ public abstract class ProxyCreator {
 		Provides annotation = method.getAnnotation(Provides.class);
 		String name = ((Provides) annotation).name();
 		contextBeansHolder.getGlobalProvidesMap().put(name, method.invoke(className.newInstance()));
-
 	    }
 	}
     }
@@ -160,28 +124,50 @@ public abstract class ProxyCreator {
 
     }
 
+    protected void scanInjectedFields(Class<?> className, Object realObject) throws IllegalArgumentException, IllegalAccessException {
+	Field[] fields = className.getDeclaredFields();
+	for (Field field : fields) {
+	    setFieldValue(realObject, field);
+	}
+
+    }
+
+    private void setFieldValue(Object realObject, Field field) throws IllegalAccessException {
+	field.setAccessible(true);
+	if (field.isAnnotationPresent(Inject.class)) {
+	if (!field.getAnnotation(Inject.class).method().isEmpty()) {
+	    field.set(realObject, contextBeansHolder.getGlobalProvidesMap().get(field.getAnnotation(Inject.class).method()));
+	} else {
+	    String name = field.getAnnotation(Inject.class).name();
+	    if (!name.equals("")) {
+		field.set(realObject, contextBeansHolder.getGlobalBeansMap().get(name));
+	    } else {
+		field.set(realObject, contextBeansHolder.getGlobalBeansMap().get(field.getType().getSimpleName()));
+	    }
+	}
+	}
+    }
+    
+    protected void scanInjectedMethods(final Class<?> className, Object object) {
+   	Method[] methods = className.getDeclaredMethods();
+   	for (Method method : methods) {
+   	    if (method.getName().startsWith("set") && method.isAnnotationPresent(Inject.class)) {
+   		String name = method.getAnnotation(Inject.class).name();
+   		try {
+   		    method.invoke(object, contextBeansHolder.getGlobalBeansMap().get(name));
+   		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+   		    e.printStackTrace();
+   		}
+   	    }
+   	}
+       }
+
     public abstract Object createBeanProxy(Class<?> annotatedClass);
 
     public abstract Object loadInitialSingletons(Class<?> annotatedClass);
 
-    public abstract Object createSingletonProxy(Class<?> className);
+    public abstract Object createFullSingletonProxy(Class<?> className);
 
-    // public Map<String, Object> getGlobalBeansMap() {
-    // return globalBeansMap;
-    // }
-    //
-    // public void setGlobalBeansMap(Map<String, Object> globalBeansMap) {
-    // this.globalBeansMap = globalBeansMap;
-    // }
-    //
-    // public Map<String, Object> getGlobalSingletonMap() {
-    // return globalSingletonMap;
-    // }
-    //
-    // public void setGlobalSingletonMap(Map<String, Object> globalSingletonMap)
-    // {
-    // this.globalSingletonMap = globalSingletonMap;
-    // }
 
     public ParseClasses getParser() {
 	return parser;
@@ -198,13 +184,5 @@ public abstract class ProxyCreator {
     public void setContextClassLoader(ClassLoader contextClassLoader) {
 	this.contextClassLoader = contextClassLoader;
     }
-
-    // public Map<String, Object> getGlobalProvidesMap() {
-    // return globalProvidesMap;
-    // }
-    //
-    // public void setGlobalProvidesMap(Map<String, Object> globalProvidesMap) {
-    // this.globalProvidesMap = globalProvidesMap;
-    // }
 
 }

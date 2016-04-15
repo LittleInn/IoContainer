@@ -1,7 +1,6 @@
 package com.ioc.proxy;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 import com.ioc.annotations.Inject;
@@ -21,7 +20,6 @@ public class InvocationHandlerProxyCreator extends ProxyCreator {
 	} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 	    e.printStackTrace();
 	}
-	System.out.println("Create Bean Proxy: " + newInstance);
 	return newInstance;
     }
 
@@ -45,37 +43,28 @@ public class InvocationHandlerProxyCreator extends ProxyCreator {
     }
 
     @Override
-    public Object createSingletonProxy(Class<?> className) {
+    public Object createFullSingletonProxy(Class<?> className) {
 	Constructor<?>[] constructors = className.getConstructors();
 	Object newInstance = null;
+	Object constructedObj = null;
 	for (Constructor<?> constructor : constructors) {
 	    if (constructor.isAnnotationPresent(Inject.class)) {
-		Object constructedObj = null;
 		try {
 		    constructor = className.getConstructor(constructor.getParameterTypes()[0]);
-		    String service = constructor.getAnnotation(Inject.class).service();
+		    String service = constructor.getAnnotation(Inject.class).name();
 		    constructedObj = constructor.newInstance(contextBeansHolder.getGlobalSingletonMap().get(service));
-		    for (Field field : className.getFields()) {
-			field.setAccessible(true);
-			if (field.isAnnotationPresent(Inject.class)) {
-			    String beanField = field.getAnnotation(Inject.class).service();
-			    try {
-				field.set(constructedObj, contextBeansHolder.getGlobalBeansMap().get(beanField));
-			    } catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-			    }
-			}
-		    }
-		    InvocationHandlerBeanProxy frameworkProxy = new InvocationHandlerBeanProxy(constructedObj, this);
-		    newInstance = frameworkProxy.newInstance(constructedObj);
-
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
 		    e.printStackTrace();
 		}
 	    }
 	}
-	System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW INSTANCE ~~~~~~~~~~~~~~~~ "+newInstance);
-	System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW INSTANCE ~~~~~~~~~~~~~~~~ "+newInstance);
+	InvocationHandlerBeanProxy frameworkProxy = new InvocationHandlerBeanProxy(constructedObj, this);
+	try {
+	    scanInjectedFields(className, constructedObj);
+	    newInstance = frameworkProxy.newInstance(constructedObj);
+	} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+	    e.printStackTrace();
+	}
 	return newInstance;
     }
 

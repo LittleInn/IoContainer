@@ -10,7 +10,7 @@ public class SingletonServiceAImpl implements SingletonServiceA {
 
     public SingletonServiceB singletonServiceB;
 
-    @Inject(service = "companyServiceImpl")
+    @Inject(name = "companyServiceImpl")
     private CompanyService companyService;
 
     @Inject
@@ -19,7 +19,7 @@ public class SingletonServiceAImpl implements SingletonServiceA {
     public SingletonServiceAImpl() {
     }
 
-    @Inject(service = "SingletonServiceBImpl")
+    @Inject(name = "SingletonServiceBImpl")
     public SingletonServiceAImpl(SingletonServiceB singletonServiceB) {
 	System.out.println("SingletonServiceAImpl(singletonServiceB): " + singletonServiceB);
 	this.singletonServiceB = singletonServiceB;
