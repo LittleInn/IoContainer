@@ -5,6 +5,7 @@ import com.ioc.annotations.Provides;
 
 @Bean(name = "user")
 public class User implements BaseUser {
+    private int id;
     private String name;
 
     public String getName() {
@@ -13,6 +14,20 @@ public class User implements BaseUser {
 
     public void setName(String name) {
 	this.name = name;
+    }
+
+    public User(int id, String name) {
+	super();
+	this.id = id;
+	this.name = name;
+    }
+
+    public int getId() {
+	return id;
+    }
+
+    public void setId(int id) {
+	this.id = id;
     }
 
     public User() {
