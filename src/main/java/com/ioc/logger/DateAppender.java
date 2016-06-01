@@ -1,5 +1,5 @@
 
-package com.ioc.structural;
+package com.ioc.logger;
 
 import java.util.Date;
 

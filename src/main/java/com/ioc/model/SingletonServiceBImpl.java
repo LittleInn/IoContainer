@@ -6,7 +6,7 @@ import com.ioc.annotations.Singleton;
 @Singleton
 public class SingletonServiceBImpl implements SingletonServiceB {
 
-//	@Inject(service = "SingletonServiceCImpl")
+	@Inject(name = "SingletonServiceCImpl")
 	public SingletonServiceC singletonServiceC;
 
 	public SingletonServiceBImpl() {
@@ -20,8 +20,8 @@ public class SingletonServiceBImpl implements SingletonServiceB {
 
 	@Override
 	public void provideInfo() {
-		System.out.println("In SingletonServiceBImpl provideInfo() method");
-		//singletonServiceC.describe();
+		System.out.println("In SingletonServiceBImpl provideInfo() method "+singletonServiceC);
+		singletonServiceC.describe();
 	}
 
 }

@@ -9,11 +9,18 @@ public class InvocationHandlerBeanProxy implements InvocationHandler {
 
     private Object realObject;
     private ProxyCreator proxyCreator;
+    private ProxiesCreators creators;
 
     public InvocationHandlerBeanProxy(Object realObject, ProxyCreator proxyCreator) {
 	super();
 	this.realObject = realObject;
 	this.proxyCreator = proxyCreator;
+    }
+
+    public InvocationHandlerBeanProxy(Object realObject, ProxiesCreators creators) {
+	super();
+	this.realObject = realObject;
+	this.creators = creators;
     }
 
     public Object newInstance(Object obj) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -25,14 +32,22 @@ public class InvocationHandlerBeanProxy implements InvocationHandler {
 	try {
 	    if (!method.getName().equals("toString")) {
 		Class<? extends Object> realObjectClass = realObject.getClass();
-		proxyCreator.scanInjectedFields(realObjectClass, realObject);
-		proxyCreator.scanInjectedMethods(realObjectClass, realObject);
+		Helper.scanInjectedFields(realObjectClass, realObject);
+		Helper.scanInjectedMethods(realObjectClass, realObject);
 	    }
 	    result = method.invoke(realObject, args);
 	} catch (InvocationTargetException e) {
 	    throw e.getTargetException();
 	}
 	return result;
+    }
+
+    public ProxiesCreators getCreators() {
+	return creators;
+    }
+
+    public void setCreators(ProxiesCreators creators) {
+	this.creators = creators;
     }
 
 }

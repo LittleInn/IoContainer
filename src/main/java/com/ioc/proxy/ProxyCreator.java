@@ -2,13 +2,11 @@ package com.ioc.proxy;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import com.ioc.annotations.Bean;
-import com.ioc.annotations.Inject;
 import com.ioc.annotations.Provides;
 import com.ioc.annotations.Singleton;
 import com.ioc.context.ContextBeansHolder;
@@ -21,7 +19,10 @@ public abstract class ProxyCreator {
     private ParseClasses parser;
     private ClassLoader contextClassLoader;
 
-    public ProxyCreator() {
+    private ProxiesCreators creators;
+
+    public ProxyCreator(ProxiesCreators creators) {
+	this.creators = creators;
 	parser = new ParseClasses();
 	contextClassLoader = Thread.currentThread().getContextClassLoader();
     }
@@ -42,7 +43,7 @@ public abstract class ProxyCreator {
 	    Annotation[] annotations = annotatedClass.getAnnotations();
 	    for (Annotation annotation : annotations) {
 		if (annotation instanceof Singleton) {
-		    contextBeansHolder.getGlobalSingletonMap().put(annotatedClass.getSimpleName(), loadInitialSingletons(annotatedClass));
+		    contextBeansHolder.getGlobalSingletonMap().put(annotatedClass.getSimpleName(), creators.loadInitialSingletons(annotatedClass));
 		}
 	    }
 	}
@@ -55,7 +56,7 @@ public abstract class ProxyCreator {
 	    Annotation[] annotations = annotatedClass.getAnnotations();
 	    for (Annotation annotation : annotations) {
 		if (annotation instanceof Singleton) {
-		    Object createSingletonProxy = createFullSingletonProxy(annotatedClass);
+		    Object createSingletonProxy = creators.createFullSingletonProxy(annotatedClass);
 		    contextBeansHolder.getGlobalSingletonMap().put(annotatedClass.getSimpleName(), createSingletonProxy);
 		    contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getSimpleName(), createSingletonProxy);
 		}
@@ -78,7 +79,8 @@ public abstract class ProxyCreator {
 	for (Annotation annotation : annotations) {
 	    if (annotation instanceof Bean) {
 		String name = ((Bean) annotation).name();
-		Object proxy = createBeanProxy(annotatedClass);
+		// TODO
+		Object proxy = creators.createBeanProxy(annotatedClass);
 		contextBeansHolder.getGlobalBeansMap().put(name, proxy);
 		if (annotatedClass.getInterfaces().length > 0) {
 		    contextBeansHolder.getGlobalBeansMap().put(annotatedClass.getInterfaces()[0].getSimpleName(), proxy);
@@ -124,50 +126,11 @@ public abstract class ProxyCreator {
 
     }
 
-    protected void scanInjectedFields(Class<?> className, Object realObject) throws IllegalArgumentException, IllegalAccessException {
-	Field[] fields = className.getDeclaredFields();
-	for (Field field : fields) {
-	    setFieldValue(realObject, field);
-	}
+    public abstract Object createBean(Class<?> annotatedClass);
 
-    }
+    public abstract Object loadInitialSingleton(Class<?> annotatedClass);
 
-    private void setFieldValue(Object realObject, Field field) throws IllegalAccessException {
-	field.setAccessible(true);
-	if (field.isAnnotationPresent(Inject.class)) {
-	if (!field.getAnnotation(Inject.class).method().isEmpty()) {
-	    field.set(realObject, contextBeansHolder.getGlobalProvidesMap().get(field.getAnnotation(Inject.class).method()));
-	} else {
-	    String name = field.getAnnotation(Inject.class).name();
-	    if (!name.equals("")) {
-		field.set(realObject, contextBeansHolder.getGlobalBeansMap().get(name));
-	    } else {
-		field.set(realObject, contextBeansHolder.getGlobalBeansMap().get(field.getType().getSimpleName()));
-	    }
-	}
-	}
-    }
-    
-    protected void scanInjectedMethods(final Class<?> className, Object object) {
-   	Method[] methods = className.getDeclaredMethods();
-   	for (Method method : methods) {
-   	    if (method.getName().startsWith("set") && method.isAnnotationPresent(Inject.class)) {
-   		String name = method.getAnnotation(Inject.class).name();
-   		try {
-   		    method.invoke(object, contextBeansHolder.getGlobalBeansMap().get(name));
-   		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-   		    e.printStackTrace();
-   		}
-   	    }
-   	}
-       }
-
-    public abstract Object createBeanProxy(Class<?> annotatedClass);
-
-    public abstract Object loadInitialSingletons(Class<?> annotatedClass);
-
-    public abstract Object createFullSingletonProxy(Class<?> className);
-
+    public abstract Object buildFullSingletonProxy(Class<?> className);
 
     public ParseClasses getParser() {
 	return parser;
@@ -183,6 +146,14 @@ public abstract class ProxyCreator {
 
     public void setContextClassLoader(ClassLoader contextClassLoader) {
 	this.contextClassLoader = contextClassLoader;
+    }
+
+    public ProxiesCreators getCreators() {
+	return creators;
+    }
+
+    public void setCreators(ProxiesCreators creators) {
+	this.creators = creators;
     }
 
 }

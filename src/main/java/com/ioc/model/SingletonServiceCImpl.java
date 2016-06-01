@@ -5,22 +5,22 @@ import com.ioc.annotations.Singleton;
 
 @Singleton
 public class SingletonServiceCImpl implements SingletonServiceC {
-	
-//	@Inject(service = "SingletonServiceAImpl")
-	public SingletonServiceA singletonServiceA;
 
-	public SingletonServiceCImpl() {
-	}
+    @Inject(name = "SingletonServiceAImpl")
+    public SingletonServiceA singletonServiceA;
 
-	@Inject(name = "SingletonServiceAImpl")
-	public SingletonServiceCImpl(SingletonServiceA singletonServiceA) {
-		System.out.println("SingletonServiceCImpl(singletonServiceA): "+singletonServiceA);
-		this.singletonServiceA = singletonServiceA;
-	}
+    public SingletonServiceCImpl() {
+    }
 
-	@Override
-	public void describe() {
-		System.out.println("In describe method class SigletonServiceCImlp");
-	}
+    @Inject(name = "SingletonServiceAImpl")
+    public SingletonServiceCImpl(SingletonServiceA singletonServiceA) {
+	System.out.println("SingletonServiceCImpl(singletonServiceA): " + singletonServiceA);
+	this.singletonServiceA = singletonServiceA;
+    }
+
+    @Override
+    public void describe() {
+	System.out.println("In describe method class SigletonServiceCImlp");
+    }
 
 }

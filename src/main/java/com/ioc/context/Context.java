@@ -12,21 +12,11 @@ public abstract class Context {
 	this.proxyCreator = proxyCreator;
     }
 
-//    public void register(String packageName) {
-////	proxyCreator.loadSingletons(packageName);
-//	proxyCreator.loadBeanClasses();
-//	proxyCreator.loadProvidedPackageClass(packageName);
-//    }
-
     public void buildContext(List<Class> classes) {
 	proxyCreator.loadBeanClasses(classes);
-	 proxyCreator.buildSingletonBeans(classes);
+	proxyCreator.buildSingletonBeans(classes);
 	// proxyCreator.loadProvidedPackageClass(classes);
     }
-
-//    public Object getBean(String name) {
-//	return proxyCreator.getGlobalBeansMap().get(name);
-//    }
 
     public ProxyCreator getProxyCreator() {
 	return proxyCreator;

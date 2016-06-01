@@ -45,4 +45,8 @@ public class User implements BaseUser {
 	return user;
     }
 
+    @Override
+    public String toString() {
+	return super.toString();
+    }
 }

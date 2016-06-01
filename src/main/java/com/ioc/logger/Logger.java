@@ -1,4 +1,4 @@
-package com.ioc.structural;
+package com.ioc.logger;
 
 
 public abstract class Logger implements LogComponent{
