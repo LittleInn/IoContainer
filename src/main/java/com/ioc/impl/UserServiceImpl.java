@@ -30,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Inject(name = "mailService")
     private MailService mailService;
+    
+    @Inject
+    private AddressService addressService;
 
     public UserServiceImpl() {
     }
