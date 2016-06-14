@@ -1,18 +1,18 @@
 package com.ioc.transaction;
 
-public class RevertTransaction implements Transactions {
+public class RollbackTransaction implements Transactions {
     private Transaction transactions;
 
-    public RevertTransaction(Transaction transactions) {
+    public RollbackTransaction(Transaction transactions) {
 	super();
 	this.transactions = transactions;
     }
-    public RevertTransaction() {
+    public RollbackTransaction() {
 	this(new Transaction());
     }
 
     @Override
     public void execute() {
-	transactions.revertAction();
+	transactions.rollbackAction();
     }
 }

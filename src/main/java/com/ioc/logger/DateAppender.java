@@ -1,9 +1,8 @@
-
 package com.ioc.logger;
 
 import java.util.Date;
 
-public class DateAppender extends Logger{
+public class DateAppender extends Logger {
 
     public DateAppender(LogComponent component) {
 	super(component);
@@ -11,12 +10,18 @@ public class DateAppender extends Logger{
 
     @Override
     public String info(String log) {
-	return new Date()+": "+super.info(log);
+	return new Date() + ": " + super.info(log);
     }
 
     @Override
     public String error(String log) {
-	return new Date()+": "+super.error(log);
+	return new Date() + ": " + super.error(log);
+    }
+
+    @Override
+    public String log(String log) {
+	// TODO Auto-generated method stub
+	return null;
     }
 
 }

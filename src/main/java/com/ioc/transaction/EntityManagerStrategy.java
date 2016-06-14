@@ -4,13 +4,14 @@ public class EntityManagerStrategy {
     private PersistStrategy persistStrategy;
     private UpdateStrategy updateStrategy;
     private Object object;
+    private TransactionMemento memento;
 
-    TransactionStateContext transactionStateContext = new TransactionStateContext();
-    
     private static final EntityManagerStrategy CONTEXT = new EntityManagerStrategy();
 
     public EntityManagerStrategy() {
 	this(new PersistStrategy(), new UpdateStrategy());
+	this.transactionStateContext = new TransactionStateContext();
+	this.transactionStateProcessor = new TransactionStateProcessor();
     }
 
     public EntityManagerStrategy(PersistStrategy persistStrategy, UpdateStrategy updateStrategy) {
@@ -23,13 +24,17 @@ public class EntityManagerStrategy {
 	return CONTEXT;
     }
 
-    public void persist(Object object) throws Exception{
+    public void persist(Object object) throws Exception {
 	setObject(object);
-	transactionStateContext.setState(new PersistState());
-	transactionStateContext.request(object);
-	if(object == null)throw new Exception("Fail");
-	
+	if (object == null) {
+	    transactionStateContext.setState(new RollbackTransactionState());
+	    TransactionMemento saveState = transactionStateProcessor.saveState(TransactionState.FAILED, object);
+	    setMemento(saveState);
+	    throw new Exception("Fail");
+	}
+
 	persistStrategy.execute(object);
+	transactionStateContext.setState(new CommitTransactiontState());
     }
 
     public void update(Object object) {
@@ -38,19 +43,38 @@ public class EntityManagerStrategy {
     }
 
     public Object getObject() {
-        return object;
+	return object;
     }
 
     public void setObject(Object object) {
-        this.object = object;
+	this.object = object;
     }
 
+    private TransactionStateContext transactionStateContext;
+    private TransactionStateProcessor transactionStateProcessor;
+
     public TransactionStateContext getTransactionStateContext() {
-        return transactionStateContext;
+	return transactionStateContext;
     }
 
     public void setTransactionStateContext(TransactionStateContext transactionStateContext) {
-        this.transactionStateContext = transactionStateContext;
+	this.transactionStateContext = transactionStateContext;
     }
-    
+
+    public TransactionStateProcessor getTransactionStateProcessor() {
+	return transactionStateProcessor;
+    }
+
+    public void setTransactionStateProcessor(TransactionStateProcessor transactionStateProcessor) {
+	this.transactionStateProcessor = transactionStateProcessor;
+    }
+
+    public TransactionMemento getMemento() {
+	return memento;
+    }
+
+    public void setMemento(TransactionMemento memento) {
+	this.memento = memento;
+    }
+
 }

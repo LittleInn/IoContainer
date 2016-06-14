@@ -9,7 +9,8 @@ public class TransactionStateContext {
     }
 
     public TransactionStateContext() {
-	this(new CreatedState());
+	this(new BeginTransactionState());
+
     }
 
     public void request(Object obj) {

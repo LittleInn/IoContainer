@@ -14,11 +14,16 @@ public class ClassAppender extends Logger {
 
     @Override
     public String info(String log) {
-	return "\""+clazz.getSimpleName() + ".class\": " + super.info(log);
+	return "\"" + clazz.getSimpleName() + ".class\": " + super.info(log);
     }
 
     @Override
     public String error(String log) {
-	return "\""+clazz.getSimpleName() + ".class\": " + super.error(log);
+	return "\"" + clazz.getSimpleName() + ".class\": " + super.error(log);
+    }
+
+    @Override
+    public String log(String log) {
+	return "\"" + clazz.getSimpleName() + ".class\": " + super.log(log);
     }
 }

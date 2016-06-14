@@ -3,6 +3,10 @@ package com.ioc.transaction;
 public class TransactionStateProcessor {
     private TransactionState state;
 
+    public TransactionStateProcessor() {
+	this.state = TransactionState.BEGIN;
+    }
+
     public TransactionState getState() {
 	return state;
     }

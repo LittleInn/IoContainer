@@ -4,4 +4,6 @@ public interface LogComponent {
     String error(String log);
 
     String info(String log);
+
+    String log(String log);
 }

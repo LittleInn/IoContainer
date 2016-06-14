@@ -7,12 +7,14 @@ public class BeginTransaction implements Transactions {
 	super();
 	this.transactions = transactions;
     }
+
     public BeginTransaction() {
 	this(new Transaction());
     }
+
     @Override
     public void execute() {
 	transactions.beginAction();
-	
+
     }
 }

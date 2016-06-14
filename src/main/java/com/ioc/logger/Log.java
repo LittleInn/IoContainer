@@ -17,4 +17,9 @@ public class Log implements LogComponent {
 	return "";
     }
 
+    @Override
+    public String log(String log) {
+	return null;
+    }
+
 }

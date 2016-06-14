@@ -4,18 +4,19 @@ import com.ioc.model.User;
 
 public class UsageTransaction {
     private static void test() {
-	User user = new User(1,"Inn");
-	TransactionContext context =new  TransactionContext();
-	
-	EntityManagerStrategy entityManager = context.getContext();
-	UserTransaction transaction = new UserTransaction(context);
+	User user = new User(1, "Inn");
+
+	EntityManagerStrategy entityManager = EntityManagerStrategy.getInstance();
+	UserTransaction transaction = new UserTransaction();
+
 	try {
-	    entityManager.persist(user);
-	    entityManager.getTransactionStateContext().getState();
+	    transaction.begin();
+	    entityManager.persist(null);
 	    transaction.commit();
 	} catch (Exception e) {
-	    e.printStackTrace();
-	    transaction.revert();
+	    entityManager.getTransactionStateContext().request(user);
+	    System.out.println(entityManager.getTransactionStateProcessor().restoreState(entityManager.getMemento()));
+	    transaction.rollback();
 	}
     }
 
