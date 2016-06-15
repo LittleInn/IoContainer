@@ -17,9 +17,9 @@ public class IoCFacade {
 	ContextExcecutor builder = new ContextExcecutorAdapter();
 	builder.excecuteContext();
 
-	testSingleton(builder);
-	 testCache();
-	testClassHierarchy();
+//	testSingleton(builder);
+//	 testCache();
+//	testClassHierarchy();
 
     }
 

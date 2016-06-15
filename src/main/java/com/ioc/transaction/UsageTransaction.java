@@ -11,11 +11,12 @@ public class UsageTransaction {
 
 	try {
 	    transaction.begin();
-	    entityManager.persist(null);
+	    entityManager.persist(user);
+	    System.out.println("Object saved by Memento: "+entityManager.getTransactionStateProcessor().restoreState(entityManager.getMemento()));
 	    transaction.commit();
 	} catch (Exception e) {
 	    entityManager.getTransactionStateContext().request(user);
-	    System.out.println(entityManager.getTransactionStateProcessor().restoreState(entityManager.getMemento()));
+	    System.out.println("Object saved by Memento: "+entityManager.getTransactionStateProcessor().restoreState(entityManager.getMemento()));
 	    transaction.rollback();
 	}
     }

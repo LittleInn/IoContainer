@@ -26,10 +26,10 @@ public class EntityManagerStrategy {
 
     public void persist(Object object) throws Exception {
 	setObject(object);
+	TransactionMemento saveState = transactionStateProcessor.saveState(TransactionState.FAILED, object);
+	setMemento(saveState);
 	if (object == null) {
 	    transactionStateContext.setState(new RollbackTransactionState());
-	    TransactionMemento saveState = transactionStateProcessor.saveState(TransactionState.FAILED, object);
-	    setMemento(saveState);
 	    throw new Exception("Fail");
 	}
 
